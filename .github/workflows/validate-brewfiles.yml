@@ -24,7 +24,21 @@ jobs:
           find "custom/brew" -iname '*\.Brewfile*' -print0 | \
             while IFS= read -r -d '' brewfile ; do
               echo "::group:: ===$(basename "$brewfile")==="
-              if brew bundle check --file="$brewfile" 2>&1; then
+              if ! formulae=$(brew bundle list --file="$brewfile" --brews); then
+                echo "✗ $brewfile: failed to parse Brewfile"
+                exit 1
+              fi
+              valid=1
+              while IFS= read -r formula; do
+                [ -z "$formula" ] && continue
+                if brew info --json=v2 "$formula" >/dev/null 2>&1; then
+                  echo "✓ $formula exists"
+                else
+                  echo "✗ $formula: not a valid formula"
+                  valid=0
+                fi
+              done <<< "$formulae"
+              if [ "$valid" -eq 1 ]; then
                 echo "✓ $brewfile is valid"
               else
                 echo "✗ $brewfile validation failed"

@@ -12,28 +12,26 @@ Instead, you create your own OS repository based on this template, allowing full
 
 ## What Makes this Raptor Different?
 
-Here are the changes from [Base Image Name]. This image is based on [Bluefin/Bazzite/Aurora/etc] and includes these customizations:
+Here are the changes from Fedora Silverblue. This image is based on Bluefin's shared components and includes these customizations:
 
 ### Added Packages (Build-time)
 
-- **System packages**: tmux, micro, mosh - [brief explanation of why]
+- **System packages**: tmux, micro - lightweight terminal multiplexer and editor available immediately on first boot, no runtime install needed
 
 ### Added Applications (Runtime)
 
-- **CLI Tools (Homebrew)**: neovim, helix - [brief explanation]
-- **GUI Apps (Flatpak)**: Spotify, Thunderbird - [brief explanation]
+- **CLI Tools (Homebrew)**: eza - modern, friendlier replacement for `ls` with icons and git status
+- **GUI Apps (Flatpak)**: Firefox - default web browser, installed automatically after first boot
 
 ### Removed/Disabled
 
-- List anything removed from base image
+- Nothing removed from the base image yet
 
 ### Configuration Changes
 
-- Any systemd services enabled/disabled
-- Desktop environment changes
-- Other notable modifications
+- No systemd or desktop environment changes yet
 
-_Last updated: [date]_
+_Last updated: 2026-07-10_
 
 > Replace the placeholders above with your actual customizations whenever you add or remove packages, apps, or configuration. This section is what tells users how your image differs from the base.
 
