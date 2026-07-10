@@ -17,6 +17,8 @@ Here are the changes from Fedora Silverblue. This image is based on Bluefin's sh
 ### Added Packages (Build-time)
 
 - **System packages**: tmux, micro - lightweight terminal multiplexer and editor available immediately on first boot, no runtime install needed
+- **just** - the `ujust` wrapper shipped by `@projectbluefin/common`'s shared overlay needs this binary; without it `ujust` failed with "command not found" (see Configuration Changes below)
+- **YubiKey/GnuPG tooling**: gnupg2, gnupg2-scdaemon, cryptsetup, pcsc-lite, pcsc-lite-ccid, yubikey-manager, yubikey-personalization-gui, pinentry-gnome3 - smart-card support for hardware-backed GPG/SSH keys, per [drduh/YubiKey-Guide](https://github.com/drduh/YubiKey-Guide)
 
 ### Added Applications (Runtime)
 
@@ -29,7 +31,9 @@ Here are the changes from Fedora Silverblue. This image is based on Bluefin's sh
 
 ### Configuration Changes
 
-- No systemd or desktop environment changes yet
+- **Fixed `ujust`**: `build/10-build.sh` previously only copied the `bluefin/usr/share/ublue-os/just/*` recipe files from `@projectbluefin/common`, but not the `shared/` overlay that provides the `/usr/bin/ujust` wrapper itself, the recipe files it imports (`apps.just`, `default.just`, `shared.just`, `update.just`), or the `just` binary. The `ujust` command didn't work at all. Now the full `shared/` overlay is rsynced in, `just` is installed, and `systemctl preset-all` applies the default enablement declared by any new units it brings in. This also picked up the U2F/security-key udev rules and the pcscd polkit access rule from `@projectbluefin/common`, useful for the YubiKey setup below.
+- `pcscd.socket` enabled for smart-card support
+- `ujust setup-yubikey` deploys the drduh/YubiKey-Guide hardened GnuPG config (`~/.gnupg/{gpg,gpg-agent,scdaemon}.conf`) and wires up `gpg-agent` as the SSH agent. Key generation and moving keys to the YubiKey remain manual, offline steps - see [custom/yubikey/README.md](custom/yubikey/README.md)
 
 _Last updated: 2026-07-10_
 
@@ -321,6 +325,7 @@ cosign verify \
 - [Flatpak Preinstall](custom/flatpaks/README.md) - GUI application setup
 - [ujust Commands](custom/ujust/README.md) - User convenience commands
 - [Build Scripts](build/README.md) - Build-time customization
+- [YubiKey/GnuPG Setup](custom/yubikey/README.md) - Hardware-backed GPG/SSH keys
 
 ## Architecture
 
