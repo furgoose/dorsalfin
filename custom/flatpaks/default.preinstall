@@ -8,6 +8,11 @@
 [Flatpak Preinstall org.mozilla.firefox]
 Branch=stable
 
+# Installed alongside Firefox, which remains the default browser (Flatpak
+# preinstall only stages the app - it does not touch xdg-mime defaults).
+[Flatpak Preinstall org.chromium.Chromium]
+Branch=stable
+
 ;[Flatpak Preinstall org.mozilla.Thunderbird]
 ;Branch=stable
 
