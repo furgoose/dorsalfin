@@ -79,3 +79,8 @@ install-vscode:
 [group('Apps')]
 install-gimp:
     ujust install-flatpak org.gimp.GIMP
+
+# Install Firefox via Flatpak
+[group('Apps')]
+install-firefox:
+    ujust install-flatpak org.mozilla.firefox
