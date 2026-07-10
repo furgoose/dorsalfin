@@ -354,7 +354,7 @@ _run-vm $target_image $tag $type $config:
     run_args+=(--env "RAM_SIZE=8G")
     run_args+=(--env "DISK_SIZE=64G")
     run_args+=(--env "TPM=Y")
-    run_args+=(--env "GPU=Y")
+    run_args+=(--env "GPU=N")
     run_args+=(--device=/dev/kvm)
     run_args+=(--volume "${PWD}/${image_file}":"/boot.${type}")
     run_args+=(docker.io/qemux/qemu)
@@ -374,6 +374,44 @@ run-vm-raw $target_image=("localhost/" + IMAGE_NAME) $tag=DEFAULT_TAG: && (_run-
 # Run a virtual machine from an ISO
 [group('Run Virtual Machine')]
 run-vm-iso $target_image=("localhost/" + IMAGE_NAME) $tag=DEFAULT_TAG: && (_run-vm target_image tag "iso" "iso/iso.toml")
+
+# Run a virtual machine using libvirt/virt-manager (best for verifying GUI apps)
+[group('Run Virtual Machine')]
+run-vm-libvirt $target_image=("localhost/" + IMAGE_NAME) $tag=DEFAULT_TAG:
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    image_file="output/qcow2/disk.qcow2"
+    if [[ ! -f "${image_file}" ]]; then
+        just build-qcow2 "$target_image" "$tag"
+    fi
+
+    # bootc-image-builder writes output as root; libvirt session mode runs as the
+    # invoking user and needs direct read/write access to the disk image.
+    just sudoif chown -R "${USER}:${USER}" output/
+
+    vm_name="dorsalfin-test"
+    if virsh --connect qemu:///session list --name --all | grep -qx "${vm_name}"; then
+        echo "Removing previous ${vm_name} VM..."
+        virsh --connect qemu:///session destroy "${vm_name}" 2>/dev/null || true
+        virsh --connect qemu:///session undefine "${vm_name}" 2>/dev/null || true
+    fi
+
+    virt-install \
+      --connect qemu:///session \
+      --name "${vm_name}" \
+      --memory 4096 \
+      --vcpus 2 \
+      --disk "path=$(pwd)/${image_file}",format=qcow2,bus=virtio \
+      --import \
+      --osinfo detect=on,require=off \
+      --graphics spice \
+      --video virtio \
+      --boot uefi \
+      --network user,model=virtio \
+      --noautoconsole
+
+    virt-viewer --connect qemu:///session --wait "${vm_name}"
 
 # Run a virtual machine using systemd-vmspawn
 [group('Run Virtual Machine')]
