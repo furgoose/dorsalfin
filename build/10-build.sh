@@ -54,6 +54,9 @@ echo "::group:: Install Packages"
 # This ensures the DNF cache is populated for future builds
 dnf5 install -y tmux
 
+# micro - simple, modern terminal text editor for quick config edits
+dnf5 install -y micro
+
 # Example using COPR with isolated pattern:
 # copr_install_isolated "ublue-os/staging" package-name
 
