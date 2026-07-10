@@ -95,6 +95,12 @@ systemctl enable brew-setup.service
 systemctl enable brew-update.timer
 systemctl enable brew-upgrade.timer
 systemctl enable pcscd.socket
+# Also enable pcscd.service directly (not just the socket): with pure socket
+# activation, the CCID reader can be enumerated by udev before anything has
+# opened the socket, leaving pcscd never started until something restarts it
+# (e.g. manually, or on next login). Enabling the service starts pcscd
+# unconditionally at boot so it's already watching for the reader.
+systemctl enable pcscd.service
 # Example: systemctl mask unwanted-service
 
 echo "::endgroup::"

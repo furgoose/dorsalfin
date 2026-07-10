@@ -10,7 +10,9 @@ the image for GPG- and SSH-over-smartcard use with a YubiKey.
    into the image at `/usr/share/ublue-os/yubikey/`, and the required packages
    (`gnupg2`, `pcsc-lite`, `pcsc-lite-ccid`, `yubikey-manager`,
    `yubikey-personalization-gui`, `pinentry-gnome3`, `cryptsetup`) are installed.
-   The `pcscd.socket` smart-card service is enabled.
+   Both `pcscd.socket` and `pcscd.service` are enabled, so the smart-card
+   daemon starts unconditionally at boot instead of relying solely on socket
+   activation (which can race with udev enumerating the reader).
 2. **At Runtime**: A user opts in by running `ujust setup-yubikey`, which copies
    these templates into `~/.gnupg/`, picks an available `pinentry` backend, and
    wires up `SSH_AUTH_SOCK`/`GPG_TTY` in their shell rc so `gpg-agent` can serve
